@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Login — ShopSphere{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center" style="min-height:70vh;align-items:center;">
+    <div class="col-md-5 col-lg-4">
+        <div class="ss-auth-card">
+            <div class="text-center mb-5">
+                <h2 style="font-weight:700;letter-spacing:-.3px;">Welcome back</h2>
+                <p class="text-ss-muted mt-1">Sign in to your ShopSphere account</p>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="ss-label">Username</label>
+                    <input type="text" name="username" class="ss-input" required autofocus placeholder="Enter your username"
+                           value="{{ form.username.value|default:'' }}">
+                    {% if form.username.errors %}
+                        <p style="color:var(--danger);font-size:.8rem;margin-top:4px;">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div class="mb-4">
+                    <label class="ss-label">Password</label>
+                    <input type="password" name="password" class="ss-input" required placeholder="Enter your password">
+                    {% if form.password.errors %}
+                        <p style="color:var(--danger);font-size:.8rem;margin-top:4px;">{{ form.password.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                {% if form.non_field_errors %}
+                <div class="ss-alert ss-alert-danger mb-4">
+                    <i class="bi bi-exclamation-circle-fill"></i> {{ form.non_field_errors.0 }}
+                </div>
+                {% endif %}
+                <button type="submit" class="btn-ss-primary w-100 py-3 rounded-2 d-block text-center" style="font-size:.9375rem;">
+                    Sign In
+                </button>
+            </form>
+            <p class="text-center mt-4 mb-0 text-ss-muted small">
+                Don't have an account?
+                <a href="{% url 'register' %}" style="font-weight:600;">Create one</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

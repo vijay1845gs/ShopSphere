@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}500 — Server Error{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-1 fw-bold text-warning">500</h1>
+    <h3 class="mb-3">Internal Server Error</h3>
+    <p class="text-muted">Something went wrong on our end. Please try again later.</p>
+    <a href="{% url 'product_list' %}" class="btn btn-primary mt-2">Back to Home</a>
+</div>
+{% endblock %}

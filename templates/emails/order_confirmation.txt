@@ -1,0 +1,23 @@
+Order Confirmation — ShopSphere
+================================
+
+Hi {{ order.user.get_full_name|default:order.user.username }},
+
+Your order #{{ order.id }} has been placed successfully.
+
+ORDER SUMMARY
+{% for item in items %}
+- {{ item.product.name }}: {{ item.quantity }} × ${{ item.price }} = ${{ item.quantity|floatformat:2|mul:item.price }}
+{% endfor %}
+
+Total: ${{ total }}
+
+View your order online: {{ order_url }}
+
+If you have any questions, please contact our support team.
+
+Best regards,
+The ShopSphere Team
+
+---
+This is an automated email — please do not reply directly.

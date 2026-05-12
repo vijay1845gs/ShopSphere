@@ -1,0 +1,32 @@
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularSwaggerView,
+    SpectacularRedocView,
+)
+from config import views as config_views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('products.urls')),
+    path('cart/', include('cart.urls')),
+    path('accounts/', include('accounts.urls')),
+    path('orders/', include('orders.urls')),
+    path('wishlist/', include('wishlist.urls')),
+    path('reviews/', include('reviews.urls')),
+    path('api/v1/', include('api.urls')),
+    path('dashboard/', config_views.admin_dashboard, name='admin_dashboard'),
+    path('api/v1/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/v1/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/v1/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler404 = 'config.views.handler404'
+handler500 = 'config.views.handler500'

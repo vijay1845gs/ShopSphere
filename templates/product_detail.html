@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block title %}{{ meta_title }} — ShopSphere{% endblock %}
+{% block extra_css %}<meta name="description" content="{{ meta_description }}">{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<nav class="mb-4" style="font-size:.8125rem;color:var(--text-muted);">
+    <a href="{% url 'product_list' %}" class="text-ss-muted">Products</a>
+    <span class="mx-2">/</span>
+    {% if product.category %}
+        <a href="{% url 'product_list' %}?category={{ product.category.slug }}" class="text-ss-muted">{{ product.category.name }}</a>
+        <span class="mx-2">/</span>
+    {% endif %}
+    <span style="color:var(--text);">{{ product.name }}</span>
+</nav>
+
+<div class="row g-5">
+
+    <!-- Image -->
+    <div class="col-md-5">
+        <div class="ss-card overflow-hidden" style="border-radius:16px;">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" class="w-100" style="height:420px;object-fit:cover;" alt="{{ product.name }}">
+            {% else %}
+                <div class="product-img-placeholder" style="height:420px;font-size:4rem;">
+                    <i class="bi bi-image"></i>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Info -->
+    <div class="col-md-7">
+        <div class="d-flex gap-2 mb-3 flex-wrap">
+            {% if product.category %}
+                <span class="ss-badge ss-badge-category">{{ product.category.name }}</span>
+            {% endif %}
+            {% for tag in product.tags.all %}
+                <span class="ss-badge ss-badge-tag">{{ tag.name }}</span>
+            {% endfor %}
+        </div>
+
+        <h1 style="font-size:1.75rem;font-weight:700;letter-spacing:-.3px;line-height:1.3;">{{ product.name }}</h1>
+
+        {% if avg_rating %}
+        <div class="d-flex align-items-center gap-2 mt-2 mb-3">
+            <span class="ss-stars">
+                {% for i in "12345" %}{% if forloop.counter <= avg_rating %}★{% else %}☆{% endif %}{% endfor %}
+            </span>
+            <span class="text-ss-muted small">{{ review_count }} review{{ review_count|pluralize }}</span>
+        </div>
+        {% endif %}
+
+        <div class="price-tag my-3">₹{{ product.price }}</div>
+
+        <p style="color:var(--text-muted);line-height:1.7;font-size:.9375rem;">{{ product.description }}</p>
+
+        <!-- Stock status -->
+        <div class="d-flex align-items-center gap-2 mb-4 p-3 rounded-2" style="background:var(--surface-2);border:1px solid var(--border);">
+            {% if product.stock > 0 %}
+                <i class="bi bi-check-circle-fill text-success"></i>
+                <span style="font-size:.875rem;font-weight:500;">In Stock</span>
+                <span class="text-ss-muted small">— {{ product.stock }} units available</span>
+            {% else %}
+                <i class="bi bi-x-circle-fill text-danger"></i>
+                <span style="font-size:.875rem;font-weight:500;color:var(--danger);">Out of Stock</span>
+            {% endif %}
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex gap-3 flex-wrap">
+            <form method="POST" action="{% url 'add_to_cart' product.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-ss-primary px-5 py-3 rounded-2 d-inline-flex align-items-center gap-2" style="font-size:.9375rem;">
+                    <i class="bi bi-bag-plus"></i> Add to Cart
+                </button>
+            </form>
+            <form method="POST" action="{% url 'buy_now' product.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-ss-success px-5 py-3 rounded-2 d-inline-flex align-items-center gap-2" style="font-size:.9375rem;">
+                    <i class="bi bi-basket"></i> Buy Now
+                </button>
+            </form>
+            {% if user.is_authenticated %}
+            <form method="POST" action="{% url 'toggle_wishlist' product.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-ss-danger px-4 py-3 rounded-2 d-inline-flex align-items-center gap-2" style="font-size:.9375rem;">
+                    {% if in_wishlist %}
+                        <i class="bi bi-heart-fill"></i> Wishlisted
+                    {% else %}
+                        <i class="bi bi-heart"></i> Wishlist
+                    {% endif %}
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<hr class="divider">
+
+<!-- Reviews -->
+<div class="row g-5">
+    <div class="col-lg-7">
+        <h5 class="ss-section-title mb-4">
+            <i class="bi bi-chat-square-text me-2"></i>Customer Reviews
+            {% if review_count %}<span class="text-ss-muted fw-normal small">({{ review_count }})</span>{% endif %}
+        </h5>
+
+        {% if reviews %}
+            {% for review in reviews %}
+            <div class="ss-card p-4 mb-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width:36px;height:36px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.875rem;flex-shrink:0;">
+                            {{ review.user.username|first|upper }}
+                        </div>
+                        <div>
+                            <p class="mb-0 fw-600" style="font-weight:600;font-size:.9rem;">{{ review.user.username }}</p>
+                            <small class="text-ss-muted">{{ review.created_at|date:"d M Y" }}</small>
+                        </div>
+                    </div>
+                    <span class="ss-stars" style="font-size:.9rem;">
+                        {% for i in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}
+                    </span>
+                </div>
+                {% if review.comment %}
+                <p class="mt-3 mb-0 text-ss-muted" style="font-size:.9rem;line-height:1.6;">{{ review.comment }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-5" style="border:2px dashed var(--border);border-radius:var(--radius);">
+                <i class="bi bi-chat-square" style="font-size:2rem;color:var(--border);"></i>
+                <p class="text-ss-muted mt-2 mb-0">No reviews yet. Be the first to review!</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Review Form -->
+{% if user.is_authenticated %}
+     <div class="col-lg-5">
+         <div class="ss-card p-4">
+             <h6 class="ss-section-title mb-4">
+                 {% if user_review %}<i class="bi bi-pencil me-2"></i>Edit Your Review{% else %}<i class="bi bi-star me-2"></i>Write a Review{% endif %}
+             </h6>
+             <form method="POST" action="{% url 'submit_review' product.id %}">
+                 {% csrf_token %}
+                 <div class="mb-3">
+                     <label class="ss-label">Your Rating</label>
+                     <select name="rating" class="form-select ss-input" required>
+                         {% for val in "12345" %}
+                             <option value="{{ val }}" {% if user_review and user_review.rating == forloop.counter %}selected{% endif %}>
+                                 {{ val }} Star{{ val|pluralize }}
+                             </option>
+                         {% endfor %}
+                     </select>
+                 </div>
+                 <div class="mb-4">
+                     <label class="ss-label">Comment <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+                     <textarea name="comment" class="ss-input" rows="4" style="resize:vertical;">{% if user_review %}{{ user_review.comment }}{% endif %}</textarea>
+                 </div>
+                 <button type="submit" class="btn-ss-primary w-100 py-2 rounded-2 d-block text-center">
+                     {% if user_review %}Update Review{% else %}Submit Review{% endif %}
+                 </button>
+             </form>
+         </div>
+     </div>
+     {% endif %}
+ </div>
+
+{% if recommendations %}
+ <hr class="divider">
+
+ <!-- Recommended Products -->
+ <div class="mb-5">
+     <h5 class="ss-section-title mb-4">
+         <i class="bi bi-lightbulb me-2"></i>You Might Also Like
+     </h5>
+     <div class="row g-4">
+         {% for rec in recommendations %}
+         <div class="col-sm-6 col-lg-4 col-xl-2">
+             <div class="ss-card h-100 d-flex flex-column">
+                 {% if rec.image %}
+                     <img src="{{ rec.image.url }}" class="w-100" style="height:140px;object-fit:cover;" alt="{{ rec.name }}">
+                 {% else %}
+                     <div class="product-img-placeholder" style="height:140px;font-size:2rem;">
+                         <i class="bi bi-image"></i>
+                     </div>
+                 {% endif %}
+                 <div class="p-3 d-flex flex-column flex-grow-1">
+                     <h6 class="mb-2" style="font-size:.875rem;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                         <a href="{{ rec.get_absolute_url }}" class="text-decoration-none">{{ rec.name }}</a>
+                     </h6>
+                     <div class="mt-auto">
+                         <p class="price-tag-sm mb-2">₹{{ rec.price }}</p>
+                         {% if rec.avg_rating %}
+                             <div class="ss-stars" style="font-size:.75rem;">
+                                 {% for i in "12345" %}{% if forloop.counter <= rec.avg_rating|floatformat:0|add:0 %}★{% else %}☆{% endif %}{% endfor %}
+                             </div>
+                         {% endif %}
+                     </div>
+                 </div>
+             </div>
+         </div>
+         {% endfor %}
+     </div>
+ </div>
+ {% endif %}
+
+{% endblock %}

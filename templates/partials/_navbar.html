@@ -1,0 +1,77 @@
+<nav class="ss-navbar">
+    <div class="container">
+        {% if user.is_authenticated and user.is_staff %}
+            {# Admin Navbar #}
+            <a class="ss-brand" href="{% url 'admin_dashboard' %}">
+                Shop<span>Sphere</span> <span class="badge bg-warning ms-2">Admin</span>
+            </a>
+            <div class="ss-nav-links">
+                <a href="{% url 'admin:index' %}" class="ss-nav-btn">
+                    <i class="bi bi-gear"></i> Admin Panel
+                </a>
+                <a href="{% url 'admin:products_product_changelist' %}" class="ss-nav-btn">
+                    <i class="bi bi-box"></i> Products
+                </a>
+                <a href="{% url 'admin:orders_order_changelist' %}" class="ss-nav-btn">
+                    <i class="bi bi-receipt"></i> Orders
+                </a>
+                <a href="{% url 'product_list' %}" class="ss-nav-btn">
+                    <i class="bi bi-shop"></i> Store
+                </a>
+                <div class="ss-divider"></div>
+                <span class="ss-user-chip"><i class="bi bi-person-gear me-1"></i>{{ user.username }}</span>
+                <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="ss-nav-btn btn-logout" style="background:none;border:none;cursor:pointer;">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            {# Customer Navbar #}
+            <a class="ss-brand" href="{% url 'product_list' %}">
+                Shop<span>Sphere</span>
+            </a>
+
+            <form class="ss-search" method="GET" action="{% url 'product_list' %}">
+                <i class="bi bi-search search-icon"></i>
+                <input type="search" name="q" placeholder="Search products, brands..." value="{{ request.GET.q }}">
+            </form>
+
+            <div class="ss-nav-links">
+                <a href="{% url 'cart_detail' %}" class="ss-nav-btn">
+                    <i class="bi bi-bag"></i>
+                    Cart
+                    {% if request.session.cart %}
+                        <span class="cart-badge">{{ request.session.cart|length }}</span>
+                    {% endif %}
+                </a>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'wishlist_detail' %}" class="ss-nav-btn">
+                        <i class="bi bi-heart"></i> Wishlist
+                    </a>
+                    <a href="{% url 'order_history' %}" class="ss-nav-btn">
+                        <i class="bi bi-receipt"></i> Orders
+                    </a>
+                    <div class="ss-divider"></div>
+                    <span class="ss-user-chip"><i class="bi bi-person-circle me-1"></i>{{ user.username }}</span>
+                    <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="ss-nav-btn btn-logout" style="background:none;border:none;cursor:pointer;">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </button>
+                    </form>
+                {% else %}
+                    <div class="ss-divider"></div>
+                    <a href="{% url 'login' %}" class="ss-nav-btn btn-login">
+                        <i class="bi bi-person"></i> Login
+                    </a>
+                    <a href="{% url 'register' %}" class="ss-nav-btn btn-register">
+                        Register
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</nav>

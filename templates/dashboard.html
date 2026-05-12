@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - ShopSphere{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="ss-section-title mb-0">Admin Dashboard</h1>
+    <a href="{% url 'admin:index' %}" class="btn-ss-outline btn-sm">
+        <i class="bi bi-gear"></i> Admin Panel
+    </a>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="ss-card p-4 text-center">
+            <i class="bi bi-box fs-1 text-primary mb-2"></i>
+            <div class="ss-section-title fs-3">{{ stats.total_products }}</div>
+            <div class="text-ss-muted">Total Products</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="ss-card p-4 text-center">
+            <i class="bi bi-clock fs-1 text-warning mb-2"></i>
+            <div class="ss-section-title fs-3">{{ stats.pending_orders }}</div>
+            <div class="text-ss-muted">Pending Orders</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="ss-card p-4 text-center">
+            <i class="bi bi-people fs-1 text-info mb-2"></i>
+            <div class="ss-section-title fs-3">{{ stats.total_users }}</div>
+            <div class="text-ss-muted">Total Users</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="ss-card p-4 text-center">
+            <i class="bi bi-check-circle fs-1 text-success mb-2"></i>
+            <div class="ss-section-title fs-3">{{ stats.delivered_orders }}</div>
+            <div class="text-ss-muted">Delivered Orders</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="ss-card p-4">
+            <h5 class="mb-3"><i class="bi bi-box me-2"></i>Manage Products</h5>
+            <p class="text-ss-muted mb-3">Add, edit, or remove products from your catalog.</p>
+            <a href="{% url 'admin:products_product_add' %}" class="btn-ss-primary btn-sm">
+                <i class="bi bi-plus"></i> Add Product
+            </a>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="ss-card p-4">
+            <h5 class="mb-3"><i class="bi bi-receipt me-2"></i>Manage Orders</h5>
+            <p class="text-ss-muted mb-3">View and process customer orders.</p>
+            <a href="{% url 'admin:orders_order_changelist' %}" class="btn-ss-primary btn-sm">
+                <i class="bi bi-list"></i> View Orders
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

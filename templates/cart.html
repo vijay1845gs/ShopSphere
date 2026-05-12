@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Shopping Cart — ShopSphere{% endblock %}
+
+{% block content %}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <h4 class="ss-section-title mb-0"><i class="bi bi-bag me-2"></i>Shopping Cart</h4>
+    {% if cart_items %}
+    <span class="ss-badge ss-badge-category">{{ cart_items|length }} item{{ cart_items|length|pluralize }}</span>
+    {% endif %}
+</div>
+
+{% if cart_items %}
+<div class="row g-4">
+
+    <!-- Cart Items -->
+    <div class="col-lg-8">
+        <div class="ss-card">
+            <div class="ss-table">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                        <tr>
+                            <td>
+                                <a href="{{ item.product.get_absolute_url }}" class="fw-600 text-decoration-none" style="font-weight:600;color:var(--text);">
+                                    {{ item.product.name }}
+                                </a>
+                                {% if item.product.category %}
+                                <br><span class="ss-badge ss-badge-category mt-1">{{ item.product.category.name }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-ss-muted">₹{{ item.product.price }}</td>
+                            <td>
+                                <form method="POST" action="{% url 'update_cart' item.product.id %}" class="d-flex align-items-center gap-2">
+                                    {% csrf_token %}
+                                    <input type="number" name="quantity" value="{{ item.quantity }}"
+                                           min="1" max="{{ item.product.stock }}"
+                                           class="ss-input text-center" style="width:64px;padding:6px 8px;">
+                                    <button type="submit" class="btn-ss-outline px-3 py-1 rounded-2" style="font-size:.8rem;white-space:nowrap;">
+                                        Update
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="price-tag-sm">₹{{ item.item_total }}</td>
+                            <td>
+                                <form method="POST" action="{% url 'remove_from_cart' item.product.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="d-flex align-items-center justify-content-center rounded-2 btn-ss-danger"
+                                            style="width:34px;height:34px;padding:0;">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </form>
+                             </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="mt-3">
+            <a href="{% url 'product_list' %}" class="btn-ss-outline px-4 py-2 rounded-2 d-inline-flex align-items-center gap-2">
+                <i class="bi bi-arrow-left"></i> Continue Shopping
+            </a>
+        </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="col-lg-4">
+        <div class="ss-card p-4">
+            <h6 class="ss-section-title mb-4">Order Summary</h6>
+            <div class="d-flex justify-content-between mb-2 text-ss-muted small">
+                <span>Subtotal ({{ cart_items|length }} items)</span>
+                <span>₹{{ total }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2 text-ss-muted small">
+                <span>Shipping</span>
+                <span class="text-success">Free</span>
+            </div>
+            <hr style="border-color:var(--border);margin:16px 0;">
+            <div class="d-flex justify-content-between mb-4">
+                <span style="font-weight:700;">Total</span>
+                <span class="price-tag">₹{{ total }}</span>
+            </div>
+            <a href="{% url 'checkout' %}" class="btn-ss-success w-100 d-block text-center py-3 rounded-2" style="font-size:.9375rem;">
+                <i class="bi bi-lock me-2"></i>Proceed to Checkout
+            </a>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="text-center py-5">
+    <i class="bi bi-bag-x" style="font-size:4rem;color:var(--border);"></i>
+    <h5 class="mt-4 mb-2">Your cart is empty</h5>
+    <p class="text-ss-muted mb-4">Looks like you haven't added anything yet.</p>
+    <a href="{% url 'product_list' %}" class="btn-ss-primary px-5 py-3 rounded-2 d-inline-block">
+        <i class="bi bi-bag me-2"></i>Start Shopping
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}

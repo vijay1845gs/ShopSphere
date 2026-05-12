@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}My Orders — ShopSphere{% endblock %}
+
+{% block content %}
+
+<h4 class="ss-section-title mb-4"><i class="bi bi-receipt me-2"></i>My Orders</h4>
+
+{% if orders %}
+<div class="ss-card">
+    <div class="ss-table">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td style="font-weight:600;">#{{ order.id }}</td>
+                    <td class="text-ss-muted">{{ order.created_at|date:"d M Y" }}</td>
+                    <td class="text-ss-muted">{{ order.items.count }} item{{ order.items.count|pluralize }}</td>
+                    <td class="price-tag-sm">₹{{ order.total_price }}</td>
+                    <td>
+                        {% if order.status == "delivered" %}
+                            <span class="ss-badge ss-badge-success"><i class="bi bi-check-circle me-1"></i>{{ order.get_status_display }}</span>
+                        {% elif order.status == "cancelled" %}
+                            <span class="ss-badge ss-badge-danger"><i class="bi bi-x-circle me-1"></i>{{ order.get_status_display }}</span>
+                        {% elif order.status == "shipped" %}
+                            <span class="ss-badge ss-badge-info"><i class="bi bi-truck me-1"></i>{{ order.get_status_display }}</span>
+                        {% else %}
+                            <span class="ss-badge ss-badge-warning"><i class="bi bi-clock me-1"></i>{{ order.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'order_detail' order.id %}" class="btn-ss-outline px-3 py-1 rounded-2 d-inline-flex align-items-center gap-1" style="font-size:.8rem;">
+                            View <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="bi bi-receipt" style="font-size:4rem;color:var(--border);"></i>
+    <h5 class="mt-4 mb-2">No orders yet</h5>
+    <p class="text-ss-muted mb-4">You haven't placed any orders. Start shopping!</p>
+    <a href="{% url 'product_list' %}" class="btn-ss-primary px-5 py-3 rounded-2 d-inline-block">
+        <i class="bi bi-bag me-2"></i>Browse Products
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}
